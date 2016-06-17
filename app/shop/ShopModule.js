@@ -1,1 +1,1 @@
-angular.module('ShopModule', []);
+angular.module('ShopModule', ['CartModule']);

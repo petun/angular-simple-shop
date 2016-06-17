@@ -1,5 +1,6 @@
 angular.module('ShopModule')
-    .controller('ProductController', ['$log', '$scope', 'shopFactory', function ($log, $scope, shopFactory) {
+    .controller('ProductController', ['$log', '$scope', 'shopFactory', 'dataServiceCart',
+        function ($log, $scope, shopFactory, dataServiceCart) {
 
         $scope.products = [];
         shopFactory.getProducts().then(function (response) {
@@ -7,7 +8,8 @@ angular.module('ShopModule')
         });
 
         $scope.addToCart = function (product) {
-            $log.log(product);
+            debugger;
+            dataServiceCart.cart.addItem(product.id, product.name, product.price, 1);
         }
 
     }]);

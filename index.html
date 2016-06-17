@@ -9,8 +9,12 @@
     <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
 
+    <script src="bower_components/ngstorage/ngStorage.min.js"></script>
+
     <script src="app/cart/CartModule.js"></script>
     <script src="app/cart/CartController.js"></script>
+    <script src="app/cart/cartService.js"></script>
+    <script src="app/cart/totalCostFilter.js"></script>
 
     <script src="app/shop/ShopModule.js"></script>
     <script src="app/shop/ShopFactory.js"></script>
@@ -18,6 +22,7 @@
     <script src="app/shop/ProductController.js"></script>
 
     <script src="app/app.js"></script>
+
 </head>
 <body>
 
@@ -29,7 +34,7 @@
             </div>
             <div class="col-md-4">
                 <div class="cart" ng-controller="CartController">
-                    total products: {{getTotal()}}, cost is {{getCost()}}
+                    total products: {{getTotal()}}, cost is {{'$ ' + (store | totalCost:'quantity':'price' | number:2)}}
                 </div>
             </div>
         </div>

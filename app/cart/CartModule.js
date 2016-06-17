@@ -1,1 +1,1 @@
-angular.module('CartModule', []);
+angular.module('CartModule', ['ngStorage']);
