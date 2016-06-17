@@ -1,0 +1,21 @@
+{
+  "name": "angular-simple-shop",
+  "authors": [
+    "petun <petun911@gmail.com>"
+  ],
+  "description": "Simple Shop App writen in angularJs",
+  "main": "index.html",
+  "keywords": [
+    "angularjs",
+    "shop"
+  ],
+  "license": "MIT",
+  "homepage": "http://petun.ru",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
