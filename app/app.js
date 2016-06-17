@@ -1,1 +1,1 @@
-angular.module('shopApp', ['CartModule']);
+angular.module('shopApp', ['CartModule', 'ShopModule']);
