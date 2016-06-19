@@ -1,1 +1,1 @@
-angular.module('shopApp', ['CartModule', 'ShopModule']);
+angular.module('shopApp', ['ngRoute', 'CartModule', 'CatalogModule']);

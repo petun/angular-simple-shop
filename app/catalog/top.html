@@ -1,0 +1,26 @@
+<div class="content">
+    <div class="container">
+        <h2>Самые выгодные предложения</h2>
+        <div class="row" ng-controller="TopController">
+            <div class="col-md-3 col-sm-4" ng-repeat="product in products">
+                <div class="product">
+                    <div class="product__preview">
+                        <a href=""><img src="{{product.thumb}}" alt="" /></a>
+                    </div>
+                    <div class="product__title">
+                        {{product.name}}
+                    </div>
+                    <div class="product__desc">
+                        {{product.description}}
+                    </div>
+                    <div class="product__weight-price">
+                        <span>{{product.weight}}</span> / <span>{{product.price}}</span>
+                    </div>
+                    <div class="product__add">
+                        <a href="" ng-click="addToCart(product)">Add to cart</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

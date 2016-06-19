@@ -59,7 +59,7 @@ angular.module('CartModule').service('dataServiceCart', ['$localStorage', functi
      */
     cart.updateItem = function (id, quantity) {
 
-        store.items[id] = quantity;
+        store.items[id].quantity = quantity;
 
         return store.items[id];
     };

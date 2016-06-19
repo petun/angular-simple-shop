@@ -8,20 +8,26 @@
     <link rel="stylesheet" href="css/style.css" />
     <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
-
     <script src="bower_components/ngstorage/ngStorage.min.js"></script>
+    <script src="bower_components/angular-route/angular-route.min.js"></script>
 
     <script src="app/cart/CartModule.js"></script>
     <script src="app/cart/CartController.js"></script>
     <script src="app/cart/cartService.js"></script>
     <script src="app/cart/totalCostFilter.js"></script>
+    <script src="app/cart/totalProductsFilter.js"></script>
+    <script src="app/cart/cartProducts.js"></script>
+    <script src="app/cart/order.js"></script>
+    <script src="app/cart/orderSuccess.js"></script>
 
-    <script src="app/shop/ShopModule.js"></script>
-    <script src="app/shop/ShopFactory.js"></script>
-    <script src="app/shop/CategoryController.js"></script>
-    <script src="app/shop/ProductController.js"></script>
+    <script src="app/catalog/ShopModule.js"></script>
+    <script src="app/catalog/ShopFactory.js"></script>
+    <script src="app/catalog/CategoryController.js"></script>
+    <script src="app/catalog/ProductController.js"></script>
+    <script src="app/catalog/TopController.js"></script>
 
     <script src="app/app.js"></script>
+    <script src="app/routing.js"></script>
 
 </head>
 <body>
@@ -30,12 +36,18 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8">
-                logo and info here
+                <a href="#!">logo and info here</a>
             </div>
             <div class="col-md-4">
                 <div class="cart" ng-controller="CartController">
-                    total products: {{getTotal()}}, cost is {{'$ ' + (store | totalCost:'quantity':'price' | number:2)}}
+                    <div class="cart__info">
+                    total products: {{store | totalProducts:'quantity'}}, cost is {{'$ ' + (store | totalCost:'quantity':'price' | number:2)}}
+                    </div>
+                    <div class="cart__order">
+                        <a href="#!/order">Make Order</a>
+                    </div>
                 </div>
+
             </div>
         </div>
         <div class="top-menu">
@@ -55,7 +67,7 @@
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav navbar-right" ng-controller="CategoryController">
                             <li ng-repeat="item in categories">
-                                <a href="#">{{item.name}}</a>
+                                <a href="#!/category/{{item.id}}">{{item.name}}</a>
                             </li>
                         </ul>
                     </div><!-- /.navbar-collapse -->
@@ -65,31 +77,8 @@
     </div>
 </header>
 
-<div class="content">
-    <div class="container">
-        <div class="row" ng-controller="ProductController">
-            <div class="col-md-3 col-sm-4" ng-repeat="product in products">
-                <div class="product">
-                    <div class="product__preview">
-                        <a href=""><img src="{{product.thumb}}" alt="" /></a>
-                    </div>
-                    <div class="product__title">
-                        {{product.name}}
-                    </div>
-                    <div class="product__desc">
-                        {{product.description}}
-                    </div>
-                    <div class="product__weight-price">
-                        <span>{{product.weight}}</span> / <span>{{product.price}}</span>
-                    </div>
-                    <div class="product__add">
-                        <a href="" ng-click="addToCart(product)">Add to cart</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<div ng-view></div>
+
 
 <footer>
     <div class="container">

@@ -1,7 +1,7 @@
 angular.module('CartModule').filter('totalCost', function(){
 
     return function (data, key1, key2) {
-        debugger;
+        // debugger;
         if (
             typeof (data) === 'undefined' &&
             typeof (key1) === 'undefined' &&
