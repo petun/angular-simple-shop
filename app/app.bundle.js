@@ -1,0 +1,436 @@
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	angular.module('shopApp', ['ngRoute', 'CartModule', 'CatalogModule']);
+
+	__webpack_require__(1);
+	__webpack_require__(2);
+	__webpack_require__(10);
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	angular.
+	module('shopApp').
+	config(['$locationProvider', '$routeProvider',
+	    function config($locationProvider, $routeProvider) {
+	        $locationProvider.hashPrefix('!');
+
+	        $routeProvider.
+
+	        when('/top', {
+	            templateUrl: 'app/catalog/top.html'
+	        }).
+	        when('/category/:categoryId', {
+	            templateUrl: 'app/catalog/category.html'
+	        }).
+	        when('/order', {
+	            template: '<order></order>'
+	        }).
+	        when('/success', {
+	            template: '<order-success></order-success>'
+	        }).
+	        otherwise('/top');
+	    }
+	]);
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	angular.module('CartModule', ['ngStorage']);
+
+	__webpack_require__(3);
+	__webpack_require__(4);
+	__webpack_require__(5);
+	__webpack_require__(6);
+	__webpack_require__(7);
+	__webpack_require__(8);
+	__webpack_require__(9);
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').controller('CartController', ['$log', '$scope', 'dataServiceCart',
+	    function ($log, $scope, dataServiceCart) {
+
+	        $scope.getTotal = function () {
+	            return _.size(dataServiceCart.store.items);
+	        };
+
+	        $scope.store = dataServiceCart.store.items;
+
+	        $scope.getCost = function () {
+
+	        }
+	    }]);
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	angular.
+	module('CartModule').
+	component('cartProducts', {
+	    //todo prevent a click or css cursor
+	    template: '<table class="table">' +
+	    '<tr><th>Name</th><th>Cost</th><th></th><th>Total Cost</th><th></th></tr>' +
+	    '<tr ng-repeat="(id, product) in products"><td>{{product.name}}</td>' +
+	    '<td>{{product.price | number:2}}</td>' +
+	    '<td><a ng-click="decreaseQuantity(id)"><i class="glyphicon glyphicon-menu-down"></i></a> {{product.quantity}} <a ng-click="increaseQuantity(id)"><i class="glyphicon glyphicon-menu-up"></i></a></td>' +
+	    '<td>{{product.price*product.quantity | number:2}}</td>' +
+	    '<td><a  ng-click="removeItem(id)"><i class="glyphicon glyphicon-remove"></i></a></td></tr>' +
+	    '</table>',
+	    controller: function GreetUserController($scope, $log, dataServiceCart) {
+
+	        $scope.products = dataServiceCart.cart.fetchAll();
+	        $log.log($scope.products);
+
+	        $scope.removeItem = function(id) {
+	            $log.log('delete item ' + id);
+	            dataServiceCart.cart.delItem(id);
+	        };
+
+	        $scope.decreaseQuantity = function(id) {
+	            var item = dataServiceCart.cart.getItem(id);
+	            if (item.quantity <= 1) {
+	                return $scope.removeItem(id);
+	            }
+	            return dataServiceCart.cart.updateItem(id, item.quantity - 1);
+	        };
+
+	        $scope.increaseQuantity = function(id) {
+	            var item = dataServiceCart.cart.getItem(id);
+	            return dataServiceCart.cart.updateItem(id, item.quantity + 1);
+	        }
+
+	    }
+	});
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').service('dataServiceCart', ['$localStorage', function ($localStorage) {
+
+	    /**
+	     * Assign localStorage to local var
+	     */
+	    var store = $localStorage.$default({
+	        items: {}
+	    });
+
+	    /**
+	     * Local methods container
+	     * @type {Object}
+	     */
+	    var cart = {};
+
+	    /**
+	     * Get single item
+	     * @param  {number} id  ID of item cart
+	     * @return {object} Get only one item by id
+	     */
+	    cart.getItem = function (id) {
+	        return store.items[id] || false;
+	    };
+
+	    /**
+	     * Add item to the cart
+	     * @param {number} id       ID of item cart
+	     * @param {number} quantity Quantity for item in thecart
+	     */
+	    cart.addItem = function (id, name, price, quantity) {
+
+	        // Check if exist already
+	        if (store.items[id]) {
+
+	            // Update name
+	            store.items[id].name = name;
+	            // Update price
+	            store.items[id].price = price;
+	            // Update quantity
+	            store.items[id].quantity = Number(store.items[id].quantity) + quantity;
+
+	        } else {
+
+	            // Store new item in cart
+	            store.items[id] = {
+	                name: name,
+	                price: price,
+	                quantity: quantity
+	            };
+	        }
+
+	        return store.items[id];
+	    };
+
+	    /**
+	     * Update item of the cart
+	     * @param {number} id       ID of item cart
+	     * @param {number} quantity Quantity for item in thecart
+	     */
+	    cart.updateItem = function (id, quantity) {
+
+	        store.items[id].quantity = quantity;
+
+	        return store.items[id];
+	    };
+
+	    /**
+	     * Remove single item
+	     * @return {object} Delete only one item by id
+	     */
+	    cart.delItem = function (id) {
+	        delete store.items[id];
+	    };
+
+	    /**
+	     * Fetch all items in cart
+	     * @return {object} Entire object cart
+	     */
+	    cart.fetchAll = function (products) {
+
+	        return store.items;
+	    };
+
+	    /**
+	     * Reset the entire cart
+	     */
+	    cart.resetAll = function () {
+	        return store.$reset();
+	    };
+
+	    return {
+	        cart: cart,
+	        store: store
+	    };
+	}]);
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	angular.
+	module('CartModule').
+	component('order', {
+	    templateUrl: 'app/cart/order.html',
+
+	    controller: function($log, $scope, dataServiceCart) {
+
+	        $scope.order = {};
+
+	        $scope.makeOrder = function(order) {
+	            order.products = dataServiceCart.cart.fetchAll();
+	            console.log(order);
+	        }
+	    }
+	});
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	angular.
+	module('CartModule').
+	component('orderSuccess', {
+	    template: '<div class="content"><div class="container">' +
+	    '<h1>Order complete successfully</h1>' +
+	    '<p>We receive your order. As soon as possible.</p>' +
+	    '</div> </div>',
+	});
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').filter('totalCost', function(){
+
+	    return function (data, key1, key2) {
+	        // debugger;
+	        if (
+	            typeof (data) === 'undefined' &&
+	            typeof (key1) === 'undefined' &&
+	            typeof (key2) === 'undefined') {
+
+	            return 0;
+	        }
+
+	        var sum = 0;
+
+	        Object.keys(data).forEach(function (i) {
+	            if (typeof data[i][key1] !== 'number' || typeof data[i][key2] !== 'number') { return; }
+	            sum = sum + (data[i][key1] * data[i][key2]);
+	        });
+
+	        return sum;
+	    }
+
+	});
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').filter('totalProducts', function(){
+
+	    return function (data, key1, key2) {
+	        // debugger;
+	        if (
+	            typeof (data) === 'undefined' &&
+	            typeof (key1) === 'undefined') {
+
+	            return 0;
+	        }
+
+	        var count = 0;
+
+	        Object.keys(data).forEach(function (i) {
+	            if (typeof data[i][key1] !== 'number') { return; }
+	            count += data[i][key1];
+	        });
+
+	        return count;
+	    }
+
+	});
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	angular.module('CatalogModule', ['CartModule']);
+
+	__webpack_require__(11);
+	__webpack_require__(12);
+	__webpack_require__(13);
+	__webpack_require__(14);
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	angular.module('CatalogModule')
+	    .controller('CategoryController', ['$log', '$scope', 'shopFactory', '$routeParams',
+	        function ($log, $scope, shopFactory, $routeParams) {
+	            $scope.categories = [];
+	            $scope.category = null;
+
+	            shopFactory.getCategories().then(function (response) {
+	                $scope.categories = response.data;
+
+	                if ($routeParams.categoryId) {
+	                    $scope.category = _.find($scope.categories, function(item) {
+	                        $log.log(item);
+	                        return item.id == $routeParams.categoryId;
+	                    });
+	                }
+	            });
+	        }]);
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	angular.module('CatalogModule')
+	    .controller('ProductController', ['$log', '$scope', 'shopFactory', 'dataServiceCart',
+	        function ($log, $scope, shopFactory, dataServiceCart) {
+
+	            //todo add model Product.. add method and add angular.extend for model creation
+	        $scope.products = [];
+	        shopFactory.getProducts().then(function (response) {
+	            $scope.products = response.data;
+	        });
+
+	        $scope.addToCart = function (product) {
+	            debugger;
+	            dataServiceCart.cart.addItem(product.id, product.name, product.price, 1);
+	        }
+
+	    }]);
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	angular.module('CatalogModule').factory('shopFactory', function ($http, $log) {
+
+	    //todo return only one response ant then analize this on front
+	    return {
+	        getCategories: function () {
+	            return $http.get('backend/category.json');
+	        },
+	        getProducts: function () {
+	            return $http.get('backend/product.json');
+	        },
+	        getTop: function() {
+	            return $http.get('backend/top.json');
+	        }
+	    }
+	});
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	angular.module('CatalogModule')
+	    .controller('TopController', ['$log', '$scope', 'shopFactory', 'dataServiceCart', function ($log, $scope, shopFactory, dataServiceCart) {
+	        $scope.products = [];
+	        shopFactory.getTop().then(function (response) {
+	            $scope.products = response.data;
+	        });
+
+	        $scope.addToCart = function (product) {
+	            debugger;
+	            dataServiceCart.cart.addItem(product.id, product.name, product.price, 1);
+	        }
+	        }]);
+
+/***/ }
+/******/ ]);
