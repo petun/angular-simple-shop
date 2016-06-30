@@ -48,7 +48,7 @@
 
 	__webpack_require__(1);
 	__webpack_require__(2);
-	__webpack_require__(10);
+	__webpack_require__(14);
 
 /***/ },
 /* 1 */
@@ -63,10 +63,10 @@
 	        $routeProvider.
 
 	        when('/top', {
-	            templateUrl: 'app/catalog/top.html'
+	            template: '<top-products></top-products>'
 	        }).
 	        when('/category/:categoryId', {
-	            templateUrl: 'app/catalog/category.html'
+	            template: '<category></category>'
 	        }).
 	        when('/order', {
 	            template: '<order></order>'
@@ -84,34 +84,131 @@
 
 	angular.module('CartModule', ['ngStorage']);
 
-	__webpack_require__(3);
-	__webpack_require__(4);
-	__webpack_require__(5);
-	__webpack_require__(6);
-	__webpack_require__(7);
-	__webpack_require__(8);
-	__webpack_require__(9);
+	__webpack_require__(20);
+
+	__webpack_require__(32);
+	__webpack_require__(33);
+
+	__webpack_require__(31);
+	__webpack_require__(26);
+
+	__webpack_require__(23);
+	__webpack_require__(24);
+
+	__webpack_require__(29);
+	__webpack_require__(30);
 
 /***/ },
-/* 3 */
+/* 3 */,
+/* 4 */,
+/* 5 */,
+/* 6 */,
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	angular.module('CatalogModule', ['CartModule']);
+
+	__webpack_require__(38);
+	__webpack_require__(39);
+	__webpack_require__(40);
+
+	__webpack_require__(41);
+
+
+/***/ },
+/* 15 */,
+/* 16 */,
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */
 /***/ function(module, exports) {
 
-	angular.module('CartModule').controller('CartController', ['$log', '$scope', 'dataServiceCart',
-	    function ($log, $scope, dataServiceCart) {
+	angular.module('CartModule')
+	.directive('addToCart', function() {
+	    return {
+	        restrict: 'E',
+	        scope: {
+	            product: '@'
+	        },
+	        template: '<a href="" ng-click="addToCart()">Add to cart</a>',
+	        controller: function($log, $scope, dataServiceCart) {
+	            $scope.product = JSON.parse($scope.product);
 
-	        $scope.getTotal = function () {
-	            return _.size(dataServiceCart.store.items);
-	        };
-
-	        $scope.store = dataServiceCart.store.items;
-
-	        $scope.getCost = function () {
-
+	            $scope.addToCart = function() {
+	                $log.log($scope.product);
+	                var product = JSON.parse($scope.product);
+	                dataServiceCart.cart.addItem(product.id, product.name, product.price, 1);
+	            }
 	        }
-	    }]);
+	    };
+	});
 
 /***/ },
-/* 4 */
+/* 21 */,
+/* 22 */,
+/* 23 */
+/***/ function(module, exports) {
+
+	angular.
+	module('CartModule').
+	component('order', {
+	    templateUrl: 'app/cart/components/order.html',
+
+	    controller: function($log, $scope, dataServiceCart, orderService, $location) {
+
+	        $scope.deliveryTypes = [
+	            {
+	                "name":"Courier",
+	                "value":"1"
+	            },
+	            {
+	                "name":"Take self from cafe",
+	                "value":"2"
+	            }
+	        ];
+
+	        $scope.order = {
+	            deliveryType: $scope.deliveryTypes[0]
+	        };
+
+
+	        $scope.makeOrder = function(order) {
+	            order.products = dataServiceCart.cart.fetchAll();
+	            orderService.makeOrder(order).then(function(response){
+	                if (response.data.result) {
+	                    $location.path('/success').replace();
+
+	                }
+	            })
+	        }
+
+	    }
+	});
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	angular.
+	module('CartModule').
+	component('orderSuccess', {
+	    template: '<div class="content"><div class="container">' +
+	    '<h1>Order complete successfully</h1>' +
+	    '<p>We receive your order. As soon as possible.</p>' +
+	    '</div> </div>',
+	});
+
+/***/ },
+/* 25 */,
+/* 26 */
 /***/ function(module, exports) {
 
 	angular.
@@ -153,7 +250,95 @@
 	});
 
 /***/ },
-/* 5 */
+/* 27 */,
+/* 28 */,
+/* 29 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').filter('totalCost', function(){
+
+	    return function (data, key1, key2) {
+	        // debugger;
+	        if (
+	            typeof (data) === 'undefined' &&
+	            typeof (key1) === 'undefined' &&
+	            typeof (key2) === 'undefined') {
+
+	            return 0;
+	        }
+
+	        var sum = 0;
+
+	        Object.keys(data).forEach(function (i) {
+	            if (typeof data[i][key1] !== 'number' || typeof data[i][key2] !== 'number') { return; }
+	            sum = sum + (data[i][key1] * data[i][key2]);
+	        });
+
+	        return sum;
+	    }
+
+	});
+
+/***/ },
+/* 30 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').filter('totalProducts', function(){
+
+	    return function (data, key1, key2) {
+	        // debugger;
+	        if (
+	            typeof (data) === 'undefined' &&
+	            typeof (key1) === 'undefined') {
+
+	            return 0;
+	        }
+
+	        var count = 0;
+
+	        Object.keys(data).forEach(function (i) {
+	            if (typeof data[i][key1] !== 'number') { return; }
+	            count += data[i][key1];
+	        });
+
+	        return count;
+	    }
+
+	});
+
+/***/ },
+/* 31 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').controller('CartController', ['$log', '$scope', 'dataServiceCart',
+	    function ($log, $scope, dataServiceCart) {
+
+	        $scope.getTotal = function () {
+	            return _.size(dataServiceCart.store.items);
+	        };
+
+	        $scope.store = dataServiceCart.store.items;
+
+	        $scope.getCost = function () {
+
+	        }
+	    }]);
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').service('orderService', ['$http', function ($http) {
+	    return {
+	        makeOrder: function(order) {
+	            return $http.post('backend/order.php', order);
+	        }
+	    }
+	}]);
+
+
+/***/ },
+/* 33 */
 /***/ function(module, exports) {
 
 	angular.module('CartModule').service('dataServiceCart', ['$localStorage', function ($localStorage) {
@@ -254,149 +439,76 @@
 
 
 /***/ },
-/* 6 */
+/* 34 */,
+/* 35 */,
+/* 36 */,
+/* 37 */,
+/* 38 */
 /***/ function(module, exports) {
 
 	angular.
 	module('CartModule').
-	component('order', {
-	    templateUrl: 'app/cart/order.html',
+	component('category', {
+	    templateUrl: 'app/catalog/components/category.html',
 
-	    controller: function($log, $scope, dataServiceCart) {
+	    controller: function ($log, $scope, shopFactory, $routeParams) {
+	        $scope.categories = [];
+	        $scope.category = null;
 
-	        $scope.order = {};
+	        shopFactory.getCategories().then(function (response) {
+	            $scope.categories = response.data;
 
-	        $scope.makeOrder = function(order) {
-	            order.products = dataServiceCart.cart.fetchAll();
-	            console.log(order);
-	        }
+	            if ($routeParams.categoryId) {
+	                $scope.category = _.find($scope.categories, function(item) {
+	                    $log.log(item);
+	                    return item.id == $routeParams.categoryId;
+	                });
+	            }
+	        });
 	    }
+
 	});
 
 /***/ },
-/* 7 */
+/* 39 */
 /***/ function(module, exports) {
 
 	angular.
 	module('CartModule').
-	component('orderSuccess', {
-	    template: '<div class="content"><div class="container">' +
-	    '<h1>Order complete successfully</h1>' +
-	    '<p>We receive your order. As soon as possible.</p>' +
-	    '</div> </div>',
+	component('categoryMenu', {
+	    templateUrl: 'app/catalog/components/category-menu.html',
+
+	    controller: function ($log, $scope, shopFactory, $routeParams) {
+	        $scope.categories = [];
+
+	        shopFactory.getCategories().then(function (response) {
+	            $scope.categories = response.data;
+	        });
+	    }
 	});
 
 /***/ },
-/* 8 */
+/* 40 */
 /***/ function(module, exports) {
 
-	angular.module('CartModule').filter('totalCost', function(){
+	angular.
+	module('CartModule').
+	component('topProducts', {
+	    templateUrl: 'app/catalog/components/category.html',
 
-	    return function (data, key1, key2) {
-	        // debugger;
-	        if (
-	            typeof (data) === 'undefined' &&
-	            typeof (key1) === 'undefined' &&
-	            typeof (key2) === 'undefined') {
+	    controller: function ($log, $scope, shopFactory, $routeParams) {
+	        $scope.category = {};
+	        $scope.category.name = 'Best products';
 
-	            return 0;
-	        }
-
-	        var sum = 0;
-
-	        Object.keys(data).forEach(function (i) {
-	            if (typeof data[i][key1] !== 'number' || typeof data[i][key2] !== 'number') { return; }
-	            sum = sum + (data[i][key1] * data[i][key2]);
+	        shopFactory.getTop().then(function (response) {
+	            $scope.category.products = response.data;
 	        });
-
-	        return sum;
 	    }
 
 	});
 
 /***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	angular.module('CartModule').filter('totalProducts', function(){
-
-	    return function (data, key1, key2) {
-	        // debugger;
-	        if (
-	            typeof (data) === 'undefined' &&
-	            typeof (key1) === 'undefined') {
-
-	            return 0;
-	        }
-
-	        var count = 0;
-
-	        Object.keys(data).forEach(function (i) {
-	            if (typeof data[i][key1] !== 'number') { return; }
-	            count += data[i][key1];
-	        });
-
-	        return count;
-	    }
-
-	});
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	angular.module('CatalogModule', ['CartModule']);
-
-	__webpack_require__(11);
-	__webpack_require__(12);
-	__webpack_require__(13);
-	__webpack_require__(14);
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	angular.module('CatalogModule')
-	    .controller('CategoryController', ['$log', '$scope', 'shopFactory', '$routeParams',
-	        function ($log, $scope, shopFactory, $routeParams) {
-	            $scope.categories = [];
-	            $scope.category = null;
-
-	            shopFactory.getCategories().then(function (response) {
-	                $scope.categories = response.data;
-
-	                if ($routeParams.categoryId) {
-	                    $scope.category = _.find($scope.categories, function(item) {
-	                        $log.log(item);
-	                        return item.id == $routeParams.categoryId;
-	                    });
-	                }
-	            });
-	        }]);
-
-/***/ },
-/* 12 */
-/***/ function(module, exports) {
-
-	angular.module('CatalogModule')
-	    .controller('ProductController', ['$log', '$scope', 'shopFactory', 'dataServiceCart',
-	        function ($log, $scope, shopFactory, dataServiceCart) {
-
-	            //todo add model Product.. add method and add angular.extend for model creation
-	        $scope.products = [];
-	        shopFactory.getProducts().then(function (response) {
-	            $scope.products = response.data;
-	        });
-
-	        $scope.addToCart = function (product) {
-	            debugger;
-	            dataServiceCart.cart.addItem(product.id, product.name, product.price, 1);
-	        }
-
-	    }]);
-
-/***/ },
-/* 13 */
+/* 41 */
 /***/ function(module, exports) {
 
 	angular.module('CatalogModule').factory('shopFactory', function ($http, $log) {
@@ -406,31 +518,11 @@
 	        getCategories: function () {
 	            return $http.get('backend/category.json');
 	        },
-	        getProducts: function () {
-	            return $http.get('backend/product.json');
-	        },
 	        getTop: function() {
 	            return $http.get('backend/top.json');
 	        }
 	    }
 	});
-
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	angular.module('CatalogModule')
-	    .controller('TopController', ['$log', '$scope', 'shopFactory', 'dataServiceCart', function ($log, $scope, shopFactory, dataServiceCart) {
-	        $scope.products = [];
-	        shopFactory.getTop().then(function (response) {
-	            $scope.products = response.data;
-	        });
-
-	        $scope.addToCart = function (product) {
-	            debugger;
-	            dataServiceCart.cart.addItem(product.id, product.name, product.price, 1);
-	        }
-	        }]);
 
 /***/ }
 /******/ ]);

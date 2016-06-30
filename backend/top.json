@@ -14,7 +14,7 @@
     "weight": "500g",
     "category_id": 1,
     "price": 1000,
-    "name": "Pizza 2",
+    "name": "Pizza Best",
     "description": "Pizza 1 description with long text",
     "full": "img/pizza1.png",
     "thumb": "img/pizza1.thumb.png"
@@ -24,7 +24,7 @@
     "weight": "500g",
     "category_id": 1,
     "price": 1000,
-    "name": "Pizza 3",
+    "name": "Pizza 33",
     "description": "Pizza 1 description with long text",
     "full": "img/pizza1.png",
     "thumb": "img/pizza1.thumb.png"

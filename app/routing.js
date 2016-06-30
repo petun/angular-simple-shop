@@ -7,10 +7,10 @@ config(['$locationProvider', '$routeProvider',
         $routeProvider.
 
         when('/top', {
-            templateUrl: 'app/catalog/top.html'
+            template: '<top-products></top-products>'
         }).
         when('/category/:categoryId', {
-            templateUrl: 'app/catalog/category.html'
+            template: '<category></category>'
         }).
         when('/order', {
             template: '<order></order>'

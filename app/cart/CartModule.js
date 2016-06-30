@@ -1,9 +1,15 @@
 angular.module('CartModule', ['ngStorage']);
 
-require('./CartController.js');
-require('./cartProducts.js');
-require('./cartService.js');
-require('./order.js');
-require('./orderSuccess.js');
-require('./totalCostFilter.js');
-require('./totalProductsFilter.js');
+require('./directives/addToCart.js');
+
+require('./services/order.js');
+require('./services/cart.js');
+
+require('./controllers/CartCtrl.js');
+require('./components/cartProducts.js');
+
+require('./components/order.js');
+require('./components/orderSuccess.js');
+
+require('./filters/totalCost.js');
+require('./filters/totalProducts.js');
