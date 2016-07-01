@@ -44,11 +44,33 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	angular.module('shopApp', ['ngRoute', 'CartModule', 'CatalogModule']);
+	(function() {
+
+	    angular.module('shopApp', ['ngRoute', 'CartModule', 'CatalogModule']);
+
+	    fetchData().then(bootstrapApplication);
+
+	    function fetchData() {
+	        var initInjector = angular.injector(["ng"]);
+	        var $http = initInjector.get("$http");
+
+	        return $http.get("backend/category.json").then(function(response) {
+	            angular.module('CatalogModule').constant('categoryStorage', response.data);
+	        }, function(errorResponse) {
+	            // Handle error case
+	        });
+	    }
+
+	    function bootstrapApplication() {
+	        angular.element(document).ready(function() {
+	            angular.bootstrap(document, ["shopApp"]);
+	        });
+	    }
+	}());
 
 	__webpack_require__(1);
 	__webpack_require__(2);
-	__webpack_require__(14);
+	__webpack_require__(12);
 
 /***/ },
 /* 1 */
@@ -84,51 +106,22 @@
 
 	angular.module('CartModule', ['ngStorage']);
 
-	__webpack_require__(20);
+	__webpack_require__(3);
 
-	__webpack_require__(32);
-	__webpack_require__(33);
+	__webpack_require__(4);
+	__webpack_require__(5);
 
-	__webpack_require__(31);
-	__webpack_require__(26);
+	__webpack_require__(6);
+	__webpack_require__(7);
 
-	__webpack_require__(23);
-	__webpack_require__(24);
+	__webpack_require__(8);
+	__webpack_require__(9);
 
-	__webpack_require__(29);
-	__webpack_require__(30);
-
-/***/ },
-/* 3 */,
-/* 4 */,
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	angular.module('CatalogModule', ['CartModule']);
-
-	__webpack_require__(38);
-	__webpack_require__(39);
-	__webpack_require__(40);
-
-	__webpack_require__(41);
-
+	__webpack_require__(10);
+	__webpack_require__(11);
 
 /***/ },
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */
+/* 3 */
 /***/ function(module, exports) {
 
 	angular.module('CartModule')
@@ -152,180 +145,7 @@
 	});
 
 /***/ },
-/* 21 */,
-/* 22 */,
-/* 23 */
-/***/ function(module, exports) {
-
-	angular.
-	module('CartModule').
-	component('order', {
-	    templateUrl: 'app/cart/components/order.html',
-
-	    controller: function($log, $scope, dataServiceCart, orderService, $location) {
-
-	        $scope.deliveryTypes = [
-	            {
-	                "name":"Courier",
-	                "value":"1"
-	            },
-	            {
-	                "name":"Take self from cafe",
-	                "value":"2"
-	            }
-	        ];
-
-	        $scope.order = {
-	            deliveryType: $scope.deliveryTypes[0]
-	        };
-
-
-	        $scope.makeOrder = function(order) {
-	            order.products = dataServiceCart.cart.fetchAll();
-	            orderService.makeOrder(order).then(function(response){
-	                if (response.data.result) {
-	                    $location.path('/success').replace();
-
-	                }
-	            })
-	        }
-
-	    }
-	});
-
-/***/ },
-/* 24 */
-/***/ function(module, exports) {
-
-	angular.
-	module('CartModule').
-	component('orderSuccess', {
-	    template: '<div class="content"><div class="container">' +
-	    '<h1>Order complete successfully</h1>' +
-	    '<p>We receive your order. As soon as possible.</p>' +
-	    '</div> </div>',
-	});
-
-/***/ },
-/* 25 */,
-/* 26 */
-/***/ function(module, exports) {
-
-	angular.
-	module('CartModule').
-	component('cartProducts', {
-	    //todo prevent a click or css cursor
-	    template: '<table class="table">' +
-	    '<tr><th>Name</th><th>Cost</th><th></th><th>Total Cost</th><th></th></tr>' +
-	    '<tr ng-repeat="(id, product) in products"><td>{{product.name}}</td>' +
-	    '<td>{{product.price | number:2}}</td>' +
-	    '<td><a ng-click="decreaseQuantity(id)"><i class="glyphicon glyphicon-menu-down"></i></a> {{product.quantity}} <a ng-click="increaseQuantity(id)"><i class="glyphicon glyphicon-menu-up"></i></a></td>' +
-	    '<td>{{product.price*product.quantity | number:2}}</td>' +
-	    '<td><a  ng-click="removeItem(id)"><i class="glyphicon glyphicon-remove"></i></a></td></tr>' +
-	    '</table>',
-	    controller: function GreetUserController($scope, $log, dataServiceCart) {
-
-	        $scope.products = dataServiceCart.cart.fetchAll();
-	        $log.log($scope.products);
-
-	        $scope.removeItem = function(id) {
-	            $log.log('delete item ' + id);
-	            dataServiceCart.cart.delItem(id);
-	        };
-
-	        $scope.decreaseQuantity = function(id) {
-	            var item = dataServiceCart.cart.getItem(id);
-	            if (item.quantity <= 1) {
-	                return $scope.removeItem(id);
-	            }
-	            return dataServiceCart.cart.updateItem(id, item.quantity - 1);
-	        };
-
-	        $scope.increaseQuantity = function(id) {
-	            var item = dataServiceCart.cart.getItem(id);
-	            return dataServiceCart.cart.updateItem(id, item.quantity + 1);
-	        }
-
-	    }
-	});
-
-/***/ },
-/* 27 */,
-/* 28 */,
-/* 29 */
-/***/ function(module, exports) {
-
-	angular.module('CartModule').filter('totalCost', function(){
-
-	    return function (data, key1, key2) {
-	        // debugger;
-	        if (
-	            typeof (data) === 'undefined' &&
-	            typeof (key1) === 'undefined' &&
-	            typeof (key2) === 'undefined') {
-
-	            return 0;
-	        }
-
-	        var sum = 0;
-
-	        Object.keys(data).forEach(function (i) {
-	            if (typeof data[i][key1] !== 'number' || typeof data[i][key2] !== 'number') { return; }
-	            sum = sum + (data[i][key1] * data[i][key2]);
-	        });
-
-	        return sum;
-	    }
-
-	});
-
-/***/ },
-/* 30 */
-/***/ function(module, exports) {
-
-	angular.module('CartModule').filter('totalProducts', function(){
-
-	    return function (data, key1, key2) {
-	        // debugger;
-	        if (
-	            typeof (data) === 'undefined' &&
-	            typeof (key1) === 'undefined') {
-
-	            return 0;
-	        }
-
-	        var count = 0;
-
-	        Object.keys(data).forEach(function (i) {
-	            if (typeof data[i][key1] !== 'number') { return; }
-	            count += data[i][key1];
-	        });
-
-	        return count;
-	    }
-
-	});
-
-/***/ },
-/* 31 */
-/***/ function(module, exports) {
-
-	angular.module('CartModule').controller('CartController', ['$log', '$scope', 'dataServiceCart',
-	    function ($log, $scope, dataServiceCart) {
-
-	        $scope.getTotal = function () {
-	            return _.size(dataServiceCart.store.items);
-	        };
-
-	        $scope.store = dataServiceCart.store.items;
-
-	        $scope.getCost = function () {
-
-	        }
-	    }]);
-
-/***/ },
-/* 32 */
+/* 4 */
 /***/ function(module, exports) {
 
 	angular.module('CartModule').service('orderService', ['$http', function ($http) {
@@ -338,7 +158,7 @@
 
 
 /***/ },
-/* 33 */
+/* 5 */
 /***/ function(module, exports) {
 
 	angular.module('CartModule').service('dataServiceCart', ['$localStorage', function ($localStorage) {
@@ -439,38 +259,207 @@
 
 
 /***/ },
-/* 34 */,
-/* 35 */,
-/* 36 */,
-/* 37 */,
-/* 38 */
+/* 6 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').controller('CartController', ['$log', '$scope', 'dataServiceCart',
+	    function ($log, $scope, dataServiceCart) {
+
+	        $scope.getTotal = function () {
+	            return _.size(dataServiceCart.store.items);
+	        };
+
+	        $scope.store = dataServiceCart.store.items;
+
+	        $scope.getCost = function () {
+
+	        }
+	    }]);
+
+/***/ },
+/* 7 */
 /***/ function(module, exports) {
 
 	angular.
 	module('CartModule').
-	component('category', {
-	    templateUrl: 'app/catalog/components/category.html',
+	component('cartProducts', {
+	    //todo prevent a click or css cursor
+	    template: '<table class="table">' +
+	    '<tr><th>Name</th><th>Cost</th><th></th><th>Total Cost</th><th></th></tr>' +
+	    '<tr ng-repeat="(id, product) in products"><td>{{product.name}}</td>' +
+	    '<td>{{product.price | number:2}}</td>' +
+	    '<td><a ng-click="decreaseQuantity(id)"><i class="glyphicon glyphicon-menu-down"></i></a> {{product.quantity}} <a ng-click="increaseQuantity(id)"><i class="glyphicon glyphicon-menu-up"></i></a></td>' +
+	    '<td>{{product.price*product.quantity | number:2}}</td>' +
+	    '<td><a  ng-click="removeItem(id)"><i class="glyphicon glyphicon-remove"></i></a></td></tr>' +
+	    '</table>',
+	    controller: function GreetUserController($scope, $log, dataServiceCart) {
 
-	    controller: function ($log, $scope, shopFactory, $routeParams) {
-	        $scope.categories = [];
-	        $scope.category = null;
+	        $scope.products = dataServiceCart.cart.fetchAll();
+	        $log.log($scope.products);
 
-	        shopFactory.getCategories().then(function (response) {
-	            $scope.categories = response.data;
+	        $scope.removeItem = function(id) {
+	            $log.log('delete item ' + id);
+	            dataServiceCart.cart.delItem(id);
+	        };
 
-	            if ($routeParams.categoryId) {
-	                $scope.category = _.find($scope.categories, function(item) {
-	                    $log.log(item);
-	                    return item.id == $routeParams.categoryId;
-	                });
+	        $scope.decreaseQuantity = function(id) {
+	            var item = dataServiceCart.cart.getItem(id);
+	            if (item.quantity <= 1) {
+	                return $scope.removeItem(id);
 	            }
+	            return dataServiceCart.cart.updateItem(id, item.quantity - 1);
+	        };
+
+	        $scope.increaseQuantity = function(id) {
+	            var item = dataServiceCart.cart.getItem(id);
+	            return dataServiceCart.cart.updateItem(id, item.quantity + 1);
+	        }
+
+	    }
+	});
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	angular.
+	module('CartModule').
+	component('order', {
+	    templateUrl: 'app/cart/components/order.html',
+
+	    controller: function($log, $scope, dataServiceCart, orderService, $location) {
+
+	        $scope.deliveryTypes = [
+	            {
+	                "name":"Courier",
+	                "value":"1"
+	            },
+	            {
+	                "name":"Take self from cafe",
+	                "value":"2"
+	            }
+	        ];
+
+	        $scope.order = {
+	            deliveryType: $scope.deliveryTypes[0]
+	        };
+
+
+	        $scope.makeOrder = function(order) {
+	            order.products = dataServiceCart.cart.fetchAll();
+	            orderService.makeOrder(order).then(function(response){
+	                if (response.data.result) {
+	                    $location.path('/success').replace();
+
+	                }
+	            })
+	        }
+
+	    }
+	});
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	angular.
+	module('CartModule').
+	component('orderSuccess', {
+	    template: '<div class="content"><div class="container">' +
+	    '<h1>Order complete successfully</h1>' +
+	    '<p>We receive your order. As soon as possible.</p>' +
+	    '</div> </div>',
+	});
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').filter('totalCost', function(){
+
+	    return function (data, key1, key2) {
+	        // debugger;
+	        if (
+	            typeof (data) === 'undefined' &&
+	            typeof (key1) === 'undefined' &&
+	            typeof (key2) === 'undefined') {
+
+	            return 0;
+	        }
+
+	        var sum = 0;
+
+	        Object.keys(data).forEach(function (i) {
+	            if (typeof data[i][key1] !== 'number' || typeof data[i][key2] !== 'number') { return; }
+	            sum = sum + (data[i][key1] * data[i][key2]);
 	        });
+
+	        return sum;
 	    }
 
 	});
 
 /***/ },
-/* 39 */
+/* 11 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').filter('totalProducts', function(){
+
+	    return function (data, key1, key2) {
+	        // debugger;
+	        if (
+	            typeof (data) === 'undefined' &&
+	            typeof (key1) === 'undefined') {
+
+	            return 0;
+	        }
+
+	        var count = 0;
+
+	        Object.keys(data).forEach(function (i) {
+	            if (typeof data[i][key1] !== 'number') { return; }
+	            count += data[i][key1];
+	        });
+
+	        return count;
+	    }
+
+	});
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	angular.module('CatalogModule', ['CartModule']);
+
+	__webpack_require__(13);
+	__webpack_require__(14);
+	__webpack_require__(15);
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	angular.module('CartModule').component('category', {
+	    templateUrl: 'app/catalog/components/category.html',
+
+	    controller: function ($log, $scope, categoryStorage, $routeParams) {
+	        $scope.categories = categoryStorage;
+	        $scope.category = null;
+
+	        if ($routeParams.categoryId) {
+	            $scope.category = _.find($scope.categories, function (item) {
+	                $log.log(item);
+	                return item.id == $routeParams.categoryId;
+	            });
+	        }
+	    }
+
+	});
+
+/***/ },
+/* 14 */
 /***/ function(module, exports) {
 
 	angular.
@@ -478,17 +467,13 @@
 	component('categoryMenu', {
 	    templateUrl: 'app/catalog/components/category-menu.html',
 
-	    controller: function ($log, $scope, shopFactory, $routeParams) {
-	        $scope.categories = [];
-
-	        shopFactory.getCategories().then(function (response) {
-	            $scope.categories = response.data;
-	        });
+	    controller: function ($log, $scope, categoryStorage) {
+	        $scope.categories = categoryStorage;
 	    }
 	});
 
 /***/ },
-/* 40 */
+/* 15 */
 /***/ function(module, exports) {
 
 	angular.
@@ -496,31 +481,20 @@
 	component('topProducts', {
 	    templateUrl: 'app/catalog/components/category.html',
 
-	    controller: function ($log, $scope, shopFactory, $routeParams) {
+	    controller: function ($log, $scope, categoryStorage, $routeParams) {
 	        $scope.category = {};
 	        $scope.category.name = 'Best products';
+	        $scope.category.products = [];
 
-	        shopFactory.getTop().then(function (response) {
-	            $scope.category.products = response.data;
+	        _.each(categoryStorage, function(category){
+
+	             _.each(category.products, function (product) {
+	                if (product.is_top == 1) {
+	                    $scope.category.products.push(product);
+	                }
+	            });
+	            $log.log($scope.category.products);
 	        });
-	    }
-
-	});
-
-/***/ },
-/* 41 */
-/***/ function(module, exports) {
-
-	angular.module('CatalogModule').factory('shopFactory', function ($http, $log) {
-
-	    //todo return only one response ant then analize this on front
-	    return {
-	        getCategories: function () {
-	            return $http.get('backend/category.json');
-	        },
-	        getTop: function() {
-	            return $http.get('backend/top.json');
-	        }
 	    }
 	});
 
